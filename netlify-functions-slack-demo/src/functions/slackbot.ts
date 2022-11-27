@@ -1,26 +1,33 @@
 import { App, ExpressReceiver, ReceiverEvent } from "@slack/bolt";
 import { APIGatewayEvent, Context } from "aws-lambda";
 import * as dotenv from "dotenv";
-import { IHandlerResponse, ISlackPrivateReply, ISlackReactionReply, ISlackReply, SlashCommands } from "../constants";
+import {
+  IHandlerResponse,
+  ISlackPrivateReply,
+  ISlackReactionReply,
+  ISlackReply,
+  SlashCommands,
+} from "../constants";
 import {
   generateReceiverEvent,
   isUrlVerificationRequest,
   parseRequestBody,
   replyMessage,
   replyPrivateMessage,
-  replyReaction } from "../utils";
+  replyReaction,
+} from "../utils";
 
 dotenv.config();
 
 const expressReceiver: ExpressReceiver = new ExpressReceiver({
   signingSecret: `${process.env.SLACK_SIGNING_SECRET}`,
-  processBeforeResponse: true
+  processBeforeResponse: true,
 });
 
 const app: App = new App({
   signingSecret: `${process.env.SLACK_SIGNING_SECRET}`,
   token: `${process.env.SLACK_BOT_TOKEN}`,
-  receiver: expressReceiver
+  receiver: expressReceiver,
 });
 
 app.message(async ({ message }) => {
@@ -29,7 +36,7 @@ app.message(async ({ message }) => {
     botToken: process.env.SLACK_BOT_TOKEN,
     channelId: message.channel,
     threadTimestamp: message.ts,
-    reaction: "robot_face"
+    reaction: "robot_face",
   };
   await replyReaction(reactionPacket);
 
@@ -38,12 +45,12 @@ app.message(async ({ message }) => {
     botToken: process.env.SLACK_BOT_TOKEN,
     channelId: message.channel,
     threadTimestamp: message.ts,
-    message: "Hello :wave:"
+    message: "Hello :wave:",
   };
   await replyMessage(messagePacket);
 });
 
-app.command(SlashCommands.GREET, async({body, ack}) => {
+app.command(SlashCommands.GREET, async ({ body, ack }) => {
   ack();
 
   const messagePacket: ISlackPrivateReply = {
@@ -51,18 +58,25 @@ app.command(SlashCommands.GREET, async({body, ack}) => {
     botToken: process.env.SLACK_BOT_TOKEN,
     channelId: body.channel_id,
     userId: body.user_id,
-    message: "Greetings, user!"
+    message: "Greetings, user!",
   };
   await replyPrivateMessage(messagePacket);
 });
 
-export async function handler(event: APIGatewayEvent, context: Context): Promise<IHandlerResponse> {
-  const payload: any = parseRequestBody(event.body, event.headers["content-type"]);
+export async function handler(
+  event: APIGatewayEvent,
+  context: Context
+): Promise<IHandlerResponse> {
+  console.log("request: ", event);
+  const payload: any = parseRequestBody(
+    event.body,
+    event.headers["content-type"]
+  );
 
-  if(isUrlVerificationRequest(payload)) {
+  if (isUrlVerificationRequest(payload)) {
     return {
       statusCode: 200,
-      body: payload?.challenge
+      body: payload?.challenge,
     };
   }
 
@@ -71,6 +85,6 @@ export async function handler(event: APIGatewayEvent, context: Context): Promise
 
   return {
     statusCode: 200,
-    body: ""
+    body: "",
   };
 }
