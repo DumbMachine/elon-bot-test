@@ -1,4 +1,9 @@
-import { App, ExpressReceiver, ReceiverEvent } from "@slack/bolt";
+import {
+  App,
+  ExpressReceiver,
+  ReceiverEvent,
+  SlackEventMiddlewareArgs,
+} from "@slack/bolt";
 import { APIGatewayEvent, Context } from "aws-lambda";
 import * as dotenv from "dotenv";
 import {
@@ -11,6 +16,7 @@ import {
 import {
   generateReceiverEvent,
   isUrlVerificationRequest,
+  muskSpeak,
   parseRequestBody,
   replyMessage,
   replyPrivateMessage,
@@ -30,25 +36,44 @@ const app: App = new App({
   receiver: expressReceiver,
 });
 
-app.message(async ({ message }) => {
-  console.log("sniff messagE:", message);
-  const reactionPacket: ISlackReactionReply = {
-    app: app,
-    botToken: process.env.SLACK_BOT_TOKEN,
-    channelId: message.channel,
-    threadTimestamp: message.ts,
-    reaction: "robot_face",
-  };
-  await replyReaction(reactionPacket);
+// interface CustomMessage extends SlackEventMiddlewareArgs<"message"> {
+//   text: string;
+// }
 
-  const messagePacket: ISlackReply = {
-    app: app,
-    botToken: process.env.SLACK_BOT_TOKEN,
-    channelId: message.channel,
-    threadTimestamp: message.ts,
-    message: "Hello :wave:",
-  };
-  await replyMessage(messagePacket);
+app.message(async ({ message }) => {
+  const text = (message as any)?.text;
+  console.log("sniff messagE:", { message, text });
+  let messagePacket: ISlackReply;
+  if (text) {
+    const regex = /\b(?:elon|musk)\b/gm;
+
+    if (text.match(regex)) {
+      messagePacket = {
+        app: app,
+        botToken: process.env.SLACK_BOT_TOKEN,
+        channelId: message.channel,
+        threadTimestamp: message.ts,
+        message: muskSpeak(),
+      };
+      await replyMessage(messagePacket);
+    }
+    // else {
+    //   messagePacket = {
+    //     app: app,
+    //     botToken: process.env.SLACK_BOT_TOKEN,
+    //     channelId: message.channel,
+    //     threadTimestamp: message.ts,
+    //     message: "Hello :wave:",
+    //   };
+  }
+  // const reactionPacket: ISlackReactionReply = {
+  //   app: app,
+  //   botToken: process.env.SLACK_BOT_TOKEN,
+  //   channelId: message.channel,
+  //   threadTimestamp: message.ts,
+  //   reaction: "robot_face",
+  // };
+  // await replyReaction(reactionPacket);
 });
 
 app.command(SlashCommands.GREET, async ({ body, ack }) => {
