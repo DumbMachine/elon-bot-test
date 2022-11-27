@@ -73,9 +73,9 @@ export async function handler(
     event.headers["content-type"]
   );
   const everything = payload.elements
-    .map((elem: any) => {
+    ?.map((elem: any) => {
       return elem.elements
-        .map((e: { text: string }) => {
+        ?.map((e: { text: string }) => {
           return e.text;
         })
         .join(" ");
