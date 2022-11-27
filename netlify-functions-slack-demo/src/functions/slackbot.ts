@@ -31,6 +31,7 @@ const app: App = new App({
 });
 
 app.message(async ({ message }) => {
+  console.log("sniff messagE:", message);
   const reactionPacket: ISlackReactionReply = {
     app: app,
     botToken: process.env.SLACK_BOT_TOKEN,
@@ -67,11 +68,21 @@ export async function handler(
   event: APIGatewayEvent,
   context: Context
 ): Promise<IHandlerResponse> {
-  console.log("request: ", event);
   const payload: any = parseRequestBody(
     event.body,
     event.headers["content-type"]
   );
+  const everything = payload.elements
+    .map((elem: any) => {
+      return elem.elements
+        .map((e: { text: string }) => {
+          return e.text;
+        })
+        .join(" ");
+    })
+    .join(" ");
+
+  console.log("all strings: ", everything);
 
   if (isUrlVerificationRequest(payload)) {
     return {
@@ -88,3 +99,62 @@ export async function handler(
     body: "",
   };
 }
+
+const thing = {
+  token: "skfXtOPXC0CEu7N2JCdwMC7u",
+  team_id: "T03FGUQ58TT",
+  api_app_id: "A04CLHX1XPC",
+  event: {
+    client_msg_id: "5911707e-51f1-498b-9ce0-fa4591351f04",
+    type: "message",
+    text: "hard thing :ab:  elon musk",
+    user: "U03FU2WK048",
+    ts: "1669535097.037849",
+    blocks: [
+      {
+        type: "rich_text",
+        block_id: "3\\/ho9",
+        elements: [
+          {
+            type: "rich_text_section",
+            elements: [
+              { type: "text", text: "hard thing " },
+              { type: "emoji", name: "ab", unicode: "1f18e" },
+              { type: "text", text: "  elon musk" },
+            ],
+          },
+        ],
+      },
+    ],
+    team: "T03FGUQ58TT",
+    channel: "C03F6LQD39A",
+    event_ts: "1669535097.037849",
+    channel_type: "channel",
+  },
+  type: "event_callback",
+  event_id: "Ev04C62XV7E3",
+  event_time: 1669535097,
+  authorizations: [
+    {
+      enterprise_id: null,
+      team_id: "T03FGUQ58TT",
+      user_id: "U04CHKM4745",
+      is_bot: true,
+      is_enterprise_install: false,
+    },
+  ],
+  is_ext_shared_channel: false,
+  event_context:
+    "4-eyJldCI6Im1lc3NhZ2UiLCJ0aWQiOiJUMDNGR1VRNThUVCIsImFpZCI6IkEwNENMSFgxWFBDIiwiY2lkIjoiQzAzRjZMUUQzOUEifQ",
+};
+thing.event.blocks.map((block) => {
+  return block.elements
+    .map((elem) => {
+      return elem.elements
+        .map((e) => {
+          return e.text;
+        })
+        .join(" ");
+    })
+    .join(" ");
+});
