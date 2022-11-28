@@ -99,7 +99,8 @@ const app: App = new App({
   installerOptions: {
     stateVerification: false,
   },
-  // installationStore: new FileInstallationStore(),
+  scopes: ["channels:history", "chat:write"],
+  installationStore: new FileInstallationStore(),
 });
 
 app.get("/auth", (req, res) => {});
