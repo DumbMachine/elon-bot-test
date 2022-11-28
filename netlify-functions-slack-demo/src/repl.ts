@@ -185,6 +185,7 @@ export const worksCompare = (message: string): string => {
   //       distance: levenshteinDistance(message, y),
   //     };
   //   });
+  return messages[Math.floor(messages.length * Math.random())];
 
   if (Math.random() > 0.5) {
     return messages[Math.floor(messages.length * Math.random())];

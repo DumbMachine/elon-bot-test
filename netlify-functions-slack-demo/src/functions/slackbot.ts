@@ -43,7 +43,7 @@ app.message(async ({ message }) => {
   if (text) {
     // trigger words
     const regex =
-      /\b(?:elon|musk|twitter|engineering|code|github|interview|work|java|python|golang|js|react|intern|programming|hacker|hackernews)\b/gm;
+      /\b(?:elon|musk|twitter|engineering|code|github|interview|work|java|python|golang|js|react|intern|programming|hacker|hackernews|docker)\b/gm;
 
     if (text.match(regex)) {
       messagePacket = {
@@ -95,17 +95,6 @@ export async function handler(
     event.body,
     event.headers["content-type"]
   );
-  const everything = payload.elements
-    ?.map((elem: any) => {
-      return elem.elements
-        ?.map((e: { text: string }) => {
-          return e.text;
-        })
-        .join(" ");
-    })
-    .join(" ");
-
-  console.log("all strings: ", everything);
 
   if (isUrlVerificationRequest(payload)) {
     return {
