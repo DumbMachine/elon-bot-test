@@ -45,16 +45,17 @@ app.message(async ({ message }) => {
     const regex =
       /\b(?:elon|musk|twitter|engineering|code|github|interview|work|java|python|golang|js|react|intern|programming|hacker|hackernews|docker)\b/gm;
 
-    if (text.match(regex)) {
-      messagePacket = {
-        app: app,
-        botToken: process.env.SLACK_BOT_TOKEN,
-        channelId: message.channel,
-        threadTimestamp: message.ts,
-        message: muskSpeak(text),
-      };
-      await replyMessage(messagePacket);
-    }
+    // if (text.match(regex)) {
+    messagePacket = {
+      app: app,
+      botToken: process.env.SLACK_BOT_TOKEN,
+      channelId: message.channel,
+      threadTimestamp: message.ts,
+      message: muskSpeak(text),
+    };
+    await replyMessage(messagePacket);
+    // }
+
     // else {
     //   messagePacket = {
     //     app: app,
