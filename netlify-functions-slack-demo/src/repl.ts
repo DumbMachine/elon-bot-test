@@ -1,4 +1,121 @@
+const stopwords = [
+  "about",
+  "after",
+  "all",
+  "also",
+  "am",
+  "an",
+  "and",
+  "another",
+  "any",
+  "are",
+  "as",
+  "at",
+  "be",
+  "because",
+  "been",
+  "before",
+  "being",
+  "between",
+  "both",
+  "but",
+  "by",
+  "came",
+  "can",
+  "come",
+  "could",
+  "did",
+  "do",
+  "each",
+  "for",
+  "from",
+  "get",
+  "got",
+  "has",
+  "had",
+  "he",
+  "have",
+  "her",
+  "here",
+  "him",
+  "himself",
+  "his",
+  "how",
+  "if",
+  "in",
+  "into",
+  "is",
+  "it",
+  "like",
+  "make",
+  "many",
+  "me",
+  "might",
+  "more",
+  "most",
+  "much",
+  "must",
+  "my",
+  "never",
+  "now",
+  "of",
+  "on",
+  "only",
+  "or",
+  "other",
+  "our",
+  "out",
+  "over",
+  "said",
+  "same",
+  "should",
+  "since",
+  "some",
+  "still",
+  "such",
+  "take",
+  "than",
+  "that",
+  "the",
+  "their",
+  "them",
+  "then",
+  "there",
+  "these",
+  "they",
+  "this",
+  "those",
+  "through",
+  "to",
+  "too",
+  "under",
+  "up",
+  "very",
+  "was",
+  "way",
+  "we",
+  "well",
+  "were",
+  "what",
+  "where",
+  "which",
+  "while",
+  "who",
+  "with",
+  "would",
+  "you",
+  "your",
+  "a",
+  "i",
+];
+
 const messages = [
+  // custom
+  "ligma johnson had it coming",
+  // if input = elon
+  "Oh hi lol",
+  "A tragic case of adult onset Tourette's",
+  // from bot
   "Can this be dockerized?",
   "Can we rewrite this in Java? It's better for enterprise.",
   "Disagreeing with me is counterproductive. Fired.",
@@ -61,15 +178,40 @@ const levenshteinDistance = (s: string, t: string) => {
   return arr[t.length][s.length];
 };
 
-const compareTexts = (message: string): string => {
-  message = "“what did you get done this week?";
-  const x = messages.map((y) => {
-    return {
-      text: y,
-      distance: levenshteinDistance(message, y),
-    };
-  });
+export const worksCompare = (message: string): string => {
+  //   const x = messages.map((y) => {
+  //     return {
+  //       text: y,
+  //       distance: levenshteinDistance(message, y),
+  //     };
+  //   });
 
-  console.log(x.sort());
-  return "";
+  if (Math.random() > 0.5) {
+    return messages[Math.floor(messages.length * Math.random())];
+  } else {
+    const scores = messages.map((item) => {
+      let baseSet = new Set(
+        message
+          .toLowerCase()
+          .replace(new RegExp("\\b(" + stopwords.join("|") + ")\\b", "g"), "")
+          .split(" ")
+      );
+      let compareSet = new Set(
+        item
+          .toLowerCase()
+          .replace(new RegExp("\\b(" + stopwords.join("|") + ")\\b", "g"), "")
+          .split(" ")
+      );
+      return {
+        text: item,
+        size: new Set(
+          [...baseSet].filter((x) => compareSet.has(x) || item.includes(x))
+        ).size,
+      };
+    });
+    scores.sort((a, b) => {
+      return a.size - b.size;
+    });
+    return scores[0].text;
+  }
 };
