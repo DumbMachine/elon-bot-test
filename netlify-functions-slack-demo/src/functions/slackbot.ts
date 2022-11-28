@@ -36,16 +36,14 @@ const app: App = new App({
   receiver: expressReceiver,
 });
 
-// interface CustomMessage extends SlackEventMiddlewareArgs<"message"> {
-//   text: string;
-// }
-
 app.message(async ({ message }) => {
   const text = (message as any)?.text;
   console.log("sniff messagE:", { message, text });
   let messagePacket: ISlackReply;
   if (text) {
-    const regex = /\b(?:elon|musk)\b/gm;
+    // trigger words
+    const regex =
+      /\b(?:elon|musk|twitter|engineering|code|github|interview|work|java|python|golang|js|react|intern)\b/gm;
 
     if (text.match(regex)) {
       messagePacket = {
